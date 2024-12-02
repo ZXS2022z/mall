@@ -9,7 +9,7 @@ defineProps({
 
 <template>
   <RouterLink :to="`/detail/${goods.id}`">
-    <img :src="goods.picture" alt="" />
+    <img v-lazy-load="goods.picture" alt="" />
     <p class="title ellipsis">{{ goods.name }}</p>
     <p class="desc ellipsis">{{ goods.desc }}</p>
     <p class="price">￥{{ goods.price }}</p>

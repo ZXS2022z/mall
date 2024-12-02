@@ -19,7 +19,7 @@ onMounted(() => {
     <HomePanel v-for="item in GoodsList" :key="item.id" :title="item.name">
       <div class="big-box">
         <RouterLink :to="`/category/${item.id}`" class="cover">
-          <img :src="item.picture" alt="" />
+          <img v-lazy-load="item.picture" alt="" />
           <strong class="label">
             <span>{{ item.name }}馆</span>
             <span class="ellipsis">{{ item.saleInfo }}</span>
