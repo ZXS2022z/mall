@@ -1,32 +1,27 @@
-<!-- <script setup>
-import { ref,defineProps } from 'vue'
+<script setup>
+import { defineProps, defineEmits, onMounted } from 'vue'
+import getPowerSet from './power-set'
 
-const props = defineProps({
+const emit = defineEmits(['change'])
+const { detail } = defineProps({
   detail: {
     type: Object,
-    default: () => ({ specs: [], skus: [] }),
+    default: () => ({ specs: [], skus: [] })
   }
 })
-</script> -->
-<script>
-import { watchEffect } from 'vue'
-import getPowerSet from './power-set'
-const spliter = '★'
-// 根据skus数据得到路径字典对象
-const getPathMap = (skus) => {
-  const pathMap = {}
+
+const { skus, specs } = detail
+
+let pathMap = {}
+
+const getPathMap = () => {
   if (skus && skus.length > 0) {
     skus.forEach((sku) => {
-      // 1. 过滤出有库存有效的sku
       if (sku.inventory) {
-        // 2. 得到sku属性值数组
         const specs = sku.specs.map((spec) => spec.valueName)
-        // 3. 得到sku属性值数组的子集
         const powerSet = getPowerSet(specs)
-        // 4. 设置给路径字典对象
         powerSet.forEach((set) => {
-          const key = set.join(spliter)
-          // 如果没有就先初始化一个空数组
+          const key = set.join('-')
           if (!pathMap[key]) {
             pathMap[key] = []
           }
@@ -35,114 +30,78 @@ const getPathMap = (skus) => {
       }
     })
   }
-  return pathMap
 }
-
-// 初始化禁用状态
-function initDisabledStatus(specs, pathMap) {
+const init = () => {
+  getPathMap()
   if (specs && specs.length > 0) {
     specs.forEach((spec) => {
       spec.values.forEach((val) => {
-        // 设置禁用状态
         val.disabled = !pathMap[val.name]
       })
     })
   }
 }
 
-// 得到当前选中规格集合
 const getSelectedArr = (specs) => {
   const selectedArr = []
   specs.forEach((spec, index) => {
     const selectedVal = spec.values.find((val) => val.selected)
-    if (selectedVal) {
-      selectedArr[index] = selectedVal.name
-    } else {
-      selectedArr[index] = undefined
-    }
+    selectedArr[index] = selectedVal ? selectedVal.name : undefined
   })
   return selectedArr
 }
 
-// 更新按钮的禁用状态
-const updateDisabledStatus = (specs, pathMap) => {
-  // 遍历每一种规格
+const updateDisabledStatus = () => {
+  const selectedArr = getSelectedArr(specs)
   specs.forEach((item, i) => {
-    // 拿到当前选择的项目
-    const selectedArr = getSelectedArr(specs)
-    // 遍历每一个按钮
     item.values.forEach((val) => {
       if (!val.selected) {
         selectedArr[i] = val.name
-        // 去掉undefined之后组合成key
-        const key = selectedArr.filter((value) => value).join(spliter)
+        const key = selectedArr.filter((value) => value).join('-')
         val.disabled = !pathMap[key]
       }
     })
   })
 }
 
-export default {
-  name: 'Xtx_detailsku',
-  props: {
-    // specs:所有的规格信息  skus:所有的sku组合
-    detail: {
-      type: Object,
-      default: () => ({ specs: [], skus: [] })
-    }
-  },
-  emits: ['change'],
-  setup(props, { emit }) {
-    let pathMap = {}
-    watchEffect(() => {
-      // 得到所有字典集合
-      pathMap = getPathMap(props.detail.skus)
-      // 组件初始化的时候更新禁用状态
-      initDisabledStatus(props.detail.specs, pathMap)
+const clickSpecs = (item, val) => {
+  if (val.disabled) return
+  if (val.selected) val.selected = !val.selected
+  else {
+    item.values.forEach((bv) => {
+      bv.selected = false
     })
+    val.selected = true
+  }
 
-    const clickSpecs = (item, val) => {
-      if (val.disabled) return false
-      // 选中与取消选中逻辑
-      if (val.selected) {
-        val.selected = false
-      } else {
-        item.values.forEach((bv) => {
-          bv.selected = false
-        })
-        val.selected = true
-      }
-      // 点击之后再次更新选中状态
-      updateDisabledStatus(props.detail.specs, pathMap)
-      // 把选择的sku信息传出去给父组件
-      // 触发change事件将sku数据传递出去
-      const selectedArr = getSelectedArr(props.detail.specs).filter(
-        (value) => value
-      )
-      // 如果选中得规格数量和传入得规格总数相等则传出完整信息(都选择了)
-      // 否则传出空对象
-      if (selectedArr.length === props.detail.specs.length) {
-        // 从路径字典中得到skuId
-        const skuId = pathMap[selectedArr.join(spliter)][0]
-        const sku = props.detail.skus.find((sku) => sku.id === skuId)
-        // 传递数据给父组件
-        emit('change', {
-          skuId: sku.id,
-          price: sku.price,
-          oldPrice: sku.oldPrice,
-          inventory: sku.inventory,
-          specsText: sku.specs
-            .reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '')
-            .trim()
-        })
-      } else {
-        emit('change', {})
-      }
-    }
-    return { clickSpecs }
+  updateDisabledStatus()
+
+  const selectedArr = getSelectedArr(specs)
+  const select = selectedArr.findIndex((x) => x === undefined)
+  console.log(selectedArr, select)
+  if (select === -1) {
+    const skuId = pathMap[selectedArr.join('-')][0]
+    const sku = skus.find((sku) => sku.id === skuId)
+    console.log(sku)
+    emit('change', {
+      skuId: sku.id,
+      price: sku.price,
+      oldPrice: sku.oldPrice,
+      inventory: sku.inventory,
+      specsText: sku.specs
+        .reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '')
+        .trim()
+    })
   }
 }
+
+onMounted(() => {
+  init()
+})
+
+// console.log(detail)
 </script>
+
 <template>
   <!-- <div style="height:94px ;width: 630px;border: 1px solid #bbb;"></div> -->
   <div class="sku">

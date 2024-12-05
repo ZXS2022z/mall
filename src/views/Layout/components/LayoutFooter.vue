@@ -25,7 +25,7 @@
         <dl>
           <dt>服务热线</dt>
           <dd class="hotline">
-            400-0000-000 <small>周一至周日 8:00-18:00</small>
+            600-0000-000 <small>周一至周日 8:00-18:00</small>
           </dd>
         </dl>
       </div>
@@ -58,7 +58,7 @@
             <a href="javascript:;">搜索推荐</a>
             <a href="javascript:;">友情链接</a>
           </p>
-          <p>CopyRight © 小兔鲜儿</p>
+          <p>CopyRight © shop</p>
         </div>
       </div>
     </div>

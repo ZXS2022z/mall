@@ -40,8 +40,8 @@ const { y } = useScroll(window)
       display: inline-block;
       width: 178px;
       height: 80px;
-      background: url('@/assets/logo.png') no-repeat right 2px;
-      background-size: 160px auto;
+      background: url('@/assets/logo.png') no-repeat 10px -50px;
+      background-size: 150px auto;
     }
     .right {
       width: 200px;

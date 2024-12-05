@@ -33,8 +33,8 @@ import HeaderCart from './HeaderCart.vue'
         display: block;
         height: 132px;
         width: 168px;
-        background: url('@/assets/logo.png') no-repeat center 18px / contain;
-        background-size: 168px;
+        background: url('@/assets/logo.png') no-repeat 0 0px / contain;
+        background-size: 100px;
       }
     }
     .search {
