@@ -96,7 +96,7 @@ const cartStore = useCartStore()
     background: #fff;
     border-radius: 4px;
     padding-top: 10px;
-    opacity: 0;
+    opacity: 1;
     transition: all 0.4s 0.2s;
     transform: translateY(-200px) scale(1, 0);
 

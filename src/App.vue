@@ -1,7 +1,12 @@
 <script setup></script>
 
 <template>
-  <router-view></router-view>
+  <!-- <router-view></router-view> -->
+  <RouterView v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </RouterView>
 </template>
 
 <style lang="less">
@@ -12,15 +17,13 @@
 }
 
 #app {
-  background: #f5f5f5;
-  user-select: none; //禁止用户选中该元素中的文本内容。防止用户意外选中一些不应该被选中的区域，或保持页面的特定布局和设计不被用户的选择操作所干扰。
+  background: #f5f5f5;user-select: none; //禁止用户选中该元素中的文本内容。防止用户意外选中一些不应该被选中的区域，或保持页面的特定布局和设计不被用户的选择操作所干扰。
 }
 
 body {
   min-width: 1240px;
   font:
-    1em / 1.4 'Microsoft Yahei',
-    'PingFang SC',
+    1em / 1.4 'Microsoft Yahei','PingFang SC',
     'Avenir',
     'Segoe UI',
     'Hiragino Sans GB',
